@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Game Config Validator
 
-## Getting Started
+A Next.js service that validates game configuration JSON with JSON Schema and provides balancing feedback from an LLM.
 
-First, run the development server:
+## Install And Run
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create your local environment file:
+
+```bash
+cp .env.local.example .env.local
+```
+
+If `.env.local.example` does not exist in your copy, create `.env.local` manually as described below.
+
+3. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open the app:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configure The LLM API Key
 
-## Learn More
+Create or edit `.env.local` in the project root and add:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+GEMINI_API_KEY=your_gemini_api_key_here
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Notes:
+- Do not commit `.env.local`.
+- Restart the dev server after changing environment variables.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Example Commands To Test The Service
 
-## Deploy on Vercel
+The API endpoint is:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`POST /api/config-validator`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. Valid Configuration
+
+```bash
+curl -X POST http://localhost:3000/api/config-validator \
+	-H "Content-Type: application/json" \
+	-d '{
+		"level": 1,
+		"difficulty": "easy",
+		"reward": 5000,
+		"time_limit": 60
+	}'
+```
+
+### 2. Invalid Configuration (Schema Error)
+
+```bash
+curl -X POST http://localhost:3000/api/config-validator \
+	-H "Content-Type: application/json" \
+	-d '{
+		"level": 0,
+		"difficulty": "easy",
+		"reward": 100
+	}'
+```
+
+### 3. Malformed JSON
+
+```bash
+curl -X POST http://localhost:3000/api/config-validator \
+	-H "Content-Type: application/json" \
+	-d '{"level":1, "difficulty":"easy"'
+```
