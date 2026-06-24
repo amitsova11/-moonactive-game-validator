@@ -66,7 +66,7 @@ export default function Home() {
       </p>
 
       <div className="homeGrid">
-        <div className="homeCardConfig">
+        <div className="homeCard homeCardConfig">
           <h2>Configuration</h2>
 
           <textarea
