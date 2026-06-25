@@ -1,9 +1,64 @@
 import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { toFriendlyErrorFeedback, type LlmFeedback } from "./error";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
+type LlmProvider = "gemini" | "openai";
+
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
+const DEFAULT_OPENAI_MODEL = "gpt-4o-mini";
+
+function resolveProvider(): LlmProvider {
+  const configuredProvider = process.env.LLM_PROVIDER?.toLowerCase();
+  if (configuredProvider === "openai") {
+    return "openai";
+  }
+
+  if (configuredProvider === "gemini") {
+    return "gemini";
+  }
+
+  if (process.env.OPENAI_API_KEY && !process.env.GEMINI_API_KEY) {
+    return "openai";
+  }
+
+  return "gemini";
+}
+
+async function generateWithGemini(prompt: string): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured.");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  const response = await ai.models.generateContent({
+    model: process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL,
+    contents: prompt,
+  });
+
+  return response.text ?? "{}";
+}
+
+async function generateWithOpenAI(prompt: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is not configured.");
+  }
+
+  const client = new OpenAI({ apiKey });
+  const completion = await client.chat.completions.create({
+    model: process.env.OPENAI_MODEL || DEFAULT_OPENAI_MODEL,
+    temperature: 0.2,
+    messages: [{ role: "user", content: prompt }],
+  });
+
+  const content = completion.choices[0]?.message?.content;
+  if (!content) {
+    throw new Error("OpenAI response did not include content.");
+  }
+
+  return content;
+}
 
 function parseJsonObject(text: string): unknown {
   const fencedJson = text.match(/```json\s*([\s\S]*?)```/i);
@@ -142,13 +197,12 @@ export async function analyzeGameConfig(config: object): Promise<LlmFeedback> {
     Configuration:
     ${JSON.stringify(config, null, 2)}
   `;
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
 
-    const rawText = response.text ?? "{}";
+  try {
+    const provider = resolveProvider();
+    const rawText = provider === "openai"
+      ? await generateWithOpenAI(prompt)
+      : await generateWithGemini(prompt);
 
     try {
       return toLlmFeedback(parseJsonObject(rawText));

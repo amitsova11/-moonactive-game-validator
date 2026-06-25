@@ -50,11 +50,31 @@ http://localhost:3000
 
 ## Configure The LLM API Key
 
-Create or edit `.env.local` in the project root and add:
+Create or edit `.env.local` in the project root.
+
+### Option 1: Gemini (default)
 
 ```bash
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
+
+Optional:
+
+```bash
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+### Option 2: OpenAI
+
+```bash
+LLM_PROVIDER=openai
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4o-mini
+```
+
+Notes:
+- If `LLM_PROVIDER` is not set, the app defaults to Gemini.
+- If `LLM_PROVIDER` is not set and only `OPENAI_API_KEY` is configured, the app uses OpenAI automatically.
 
 Notes:
 - Do not commit `.env.local`.
