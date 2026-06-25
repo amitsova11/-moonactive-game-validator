@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build artifacts
+.next
+out
+coverage
+
+# Local env files
+.env
+.env.*
+!.env.example
+
+# VCS and editor
+.git
+.gitignore
+.vscode
+.idea
+
+# OS files
+.DS_Store
+
+# Docs and local notes
+CLAUDE.md
+AGENTS.md

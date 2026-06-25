@@ -28,6 +28,26 @@ npm run dev
 
 http://localhost:3000
 
+## Run With Docker
+
+1. Build the image:
+
+```bash
+docker build -t game-config-validator .
+```
+
+2. Run the container:
+
+```bash
+docker run --rm -p 3000:3000 \
+	-e GEMINI_API_KEY=your_gemini_api_key_here \
+	game-config-validator
+```
+
+3. Open the app:
+
+http://localhost:3000
+
 ## Configure The LLM API Key
 
 Create or edit `.env.local` in the project root and add:
