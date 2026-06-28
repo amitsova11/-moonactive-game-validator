@@ -93,7 +93,7 @@ export default function Home() {
 
           {result && (
             <pre className="homeAnalysisOutput">
-              {JSON.stringify(result, null, 2)}
+              <code>{JSON.stringify(result, null, 2)}</code>
             </pre>
           )}
         </div>

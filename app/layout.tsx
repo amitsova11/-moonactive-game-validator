@@ -16,9 +16,9 @@ export default function RootLayout({
     <html lang="en">
       <body style={styles.body}>
         <header style={styles.header}>
-          <div style={styles.logo}>🎮 Game Config Analyzer</div>
+          <div style={styles.logo}>🎮 Game Config Validator</div>
           <div style={styles.tagline}>
-            Schema validation + AI game design review
+            Schema validation + AI game configuration review
           </div>
         </header>
 
